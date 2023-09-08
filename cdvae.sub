@@ -1,0 +1,42 @@
+# PyTorch test of convolutional neural network
+# Submit file 
+
+# Must set the universe to Docker
+universe = container
+docker_image = jian3602/cdvae:0.3
+
+
+executable = cdvae-train.sh
+arguments = $(Process)
+# set the log, error and output files 
+log = Log_output/cdvae.log_$(Cluster)_$(Process).txt
+error = Error_output/cdvae_$(Cluster)_$(Process).err.txt
+output = output/cdvae_$(Cluster)_$(Process).out.txt
+
+#testing directories
+# take our python script to the compute node
+# the script and data are shared by multiple examples and located in a
+# different directory
+transfer_input_files = cdvae-main-32BS.tar.gz
+
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT_OR_EVICT
+# We require a machine with a compatible version of the CUDA driver
+require_gpus = (DriverVersion >= 10.1) && (GlobalMemoryMb >= 8000) 
+
+# We must request 1 CPU in addition to 1 GPU
+request_cpus = 2
+request_gpus = 1
+
+# select some memory and disk space
+request_memory = 48GB
+request_disk = 24GB
+
+# Opt in to using CHTC GPU Lab resources
++WantGPULab = true
+# Specify short job type to run more GPUs in parallel
+# Can also request "medium" or "long"
++GPUJobLength = "medium"
+
+# Tell HTCondor to run 1 instances of our job:
+queue 4
